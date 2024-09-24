@@ -65,8 +65,8 @@ export class UsersService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    return await this.userModel.findById(id);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -75,5 +75,13 @@ export class UsersService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  async findName(username: string) {
+    return await this.userModel.findOne({ email: username });
+  }
+
+  checkPass(pass: string, hash: string) {
+    return bcrypt.compareSync(pass, hash);
   }
 }

@@ -36,7 +36,7 @@ export class UsersService {
   }
 
   async findAll(currentPage: number, pageSize: number, qs: string) {
-    const { filter, sort, projection, population } = aqp(qs);
+    const { filter, sort, population } = aqp(qs);
     delete filter.currentPage;
     delete filter.pageSize;
 
@@ -50,7 +50,7 @@ export class UsersService {
       .skip(offset)
       .limit(defaultlimit)
       .sort(sort as any)
-      .select(projection)
+      .select("-password")
       .populate(population)
       .exec()
 
@@ -66,7 +66,7 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    return await this.userModel.findById(id);
+    return await this.userModel.findById(id).select("-password");
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -83,5 +83,14 @@ export class UsersService {
 
   checkPass(pass: string, hash: string) {
     return bcrypt.compareSync(pass, hash);
+  }
+
+  updateUserToken = async (refreshToken: string, _id: string) => {
+    return await this.userModel.updateOne({ _id }, { refreshToken }
+    );
+  }
+
+  findUserByToken = async (refresh_token: string) => {
+    return await this.userModel.findOne({ refreshToken: refresh_token });
   }
 }
